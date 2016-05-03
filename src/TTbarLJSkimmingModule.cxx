@@ -182,6 +182,7 @@ TTbarLJSkimmingModule::TTbarLJSkimmingModule(uhh2::Context& ctx){
   ////
 
   //// EVENT SELECTION
+  
   jet2_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(jet2_pt, 2.4))));
   jet1_sel.reset(new NJetSelection(1, -1, JetId(PtEtaCut(jet1_pt, 2.4))));
 
@@ -190,6 +191,7 @@ TTbarLJSkimmingModule::TTbarLJSkimmingModule(uhh2::Context& ctx){
 
   if(use_miniiso) twodcut_sel.reset(new TwoDCut1(-1, 20.));
   else            twodcut_sel.reset(new TwoDCut1(.4, 20.));
+
   ////
 
   //// HISTS
@@ -256,66 +258,71 @@ bool TTbarLJSkimmingModule::process(uhh2::Event& event){
   jet_cleaner1->process(event);
   sort_by_pt<Jet>(*event.jets);
 
-  /* lepton-2Dcut variables */
-  const bool pass_twodcut = twodcut_sel->passes(event); {
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Do some analysis related cuts
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+//  /* lepton-2Dcut variables */  
+//  const bool pass_twodcut = twodcut_sel->passes(event); {
+//
+//    for(auto& muo : *event.muons){
+//
+//      float    dRmin, pTrel;
+//      std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
+//
+//      muo.set_tag(Muon::twodcut_dRmin, dRmin);
+//      muo.set_tag(Muon::twodcut_pTrel, pTrel);
+//    }
+//
+//    for(auto& ele : *event.electrons){
+//
+//      float    dRmin, pTrel;
+//      std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
+//
+//      ele.set_tag(Electron::twodcut_dRmin, dRmin);
+//      ele.set_tag(Electron::twodcut_pTrel, pTrel);
+//    }
+//  }
+//
+//  jet_cleaner2->process(event);
+//  sort_by_pt<Jet>(*event.jets);
+//
+//  topjet_IDcleaner->process(event);
+//  topjet_corrector->process(event);
+//  topjet_subjet_corrector->process(event);
+//  if(topjetER_smearer.get()) topjetER_smearer->process(event);
+//  topjetlepton_cleaner->process(event);
+//  topjet_cleaner->process(event);
+//  sort_by_pt<TopJet>(*event.topjets);
 
-    for(auto& muo : *event.muons){
-
-      float    dRmin, pTrel;
-      std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
-
-      muo.set_tag(Muon::twodcut_dRmin, dRmin);
-      muo.set_tag(Muon::twodcut_pTrel, pTrel);
-    }
-
-    for(auto& ele : *event.electrons){
-
-      float    dRmin, pTrel;
-      std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
-
-      ele.set_tag(Electron::twodcut_dRmin, dRmin);
-      ele.set_tag(Electron::twodcut_pTrel, pTrel);
-    }
-  }
-
-  jet_cleaner2->process(event);
-  sort_by_pt<Jet>(*event.jets);
-
-  topjet_IDcleaner->process(event);
-  topjet_corrector->process(event);
-  topjet_subjet_corrector->process(event);
-  if(topjetER_smearer.get()) topjetER_smearer->process(event);
-  topjetlepton_cleaner->process(event);
-  topjet_cleaner->process(event);
-  sort_by_pt<TopJet>(*event.topjets);
 
   /* 2nd AK4 jet selection */
-  const bool pass_jet2 = jet2_sel->passes(event);
-  if(!pass_jet2) return false;
-  HFolder("jet2")->fill(event);
-
+//  const bool pass_jet2 = jet2_sel->passes(event);
+//  if(!pass_jet2) return false;
+//  HFolder("jet2")->fill(event);
+ 
   /* 1st AK4 jet selection */
-  const bool pass_jet1 = jet1_sel->passes(event);
-  if(!pass_jet1) return false;
-  HFolder("jet1")->fill(event);
-  ////
+// const bool pass_jet1 = jet1_sel->passes(event);
+//   if(!pass_jet1) return false;
+//   HFolder("jet1")->fill(event);
+   ////
+ 
+   //// MET selection
+//   const bool pass_met = met_sel->passes(event);
+//   if(!pass_met) return false;
+//   HFolder("met")->fill(event);
+   ////
 
-  //// MET selection
-  const bool pass_met = met_sel->passes(event);
-  if(!pass_met) return false;
-  HFolder("met")->fill(event);
-  ////
+   //// HT_lep selection
+//   const bool pass_htlep = htlep_sel->passes(event);
+//   if(!pass_htlep) return false;
+//   HFolder("htlep")->fill(event);
+   ////
 
-  //// HT_lep selection
-  const bool pass_htlep = htlep_sel->passes(event);
-  if(!pass_htlep) return false;
-  HFolder("htlep")->fill(event);
-  ////
-
-  //// LEPTON-2Dcut selection
-  if(!pass_twodcut) return false;
-  HFolder("twodcut")->fill(event);
-  ////
+   //// LEPTON-2Dcut selection
+//   if(!pass_twodcut) return false;
+//   HFolder("twodcut")->fill(event);
+   ////
 
   return true;
 }
