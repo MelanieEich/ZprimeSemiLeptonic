@@ -1,4 +1,5 @@
 #include <iostream>
+using namespace std;
 #include <memory>
 
 #include <UHH2/core/include/AnalysisModule.h>
@@ -47,9 +48,12 @@ class TTbarLJAnalysisLiteModule : public ModuleBASE {
   // selections
   std::unique_ptr<uhh2::Selection> lumi_sel;
 
+  std::unique_ptr<uhh2::Selection> jet4_sel;
+  std::unique_ptr<uhh2::Selection> jet3_sel;
   std::unique_ptr<uhh2::Selection> jet2_sel;
   std::unique_ptr<uhh2::Selection> jet1_sel;
   std::unique_ptr<uhh2::Selection> trigger_sel;
+  std::unique_ptr<uhh2::Selection> trigger2_sel;
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> htlep_sel;
   std::unique_ptr<uhh2::Selection> triangc_sel;
@@ -70,6 +74,7 @@ class TTbarLJAnalysisLiteModule : public ModuleBASE {
   uhh2::Event::Handle<std::vector<ReconstructionHypothesis> > h_ttbar_hyps;
 
   float lep1_pt_;
+  float lep1_eta_;
 
   JetId btag_ID_;
   CSVBTag::wp b_working_point;
@@ -81,6 +86,9 @@ class TTbarLJAnalysisLiteModule : public ModuleBASE {
   bool blind_DATA_;
 
   bool store_PDF_weights_;
+
+  //second trigger
+  bool second_trigger_=false;
 
   //// Data/MC scale factors
   std::unique_ptr<weightcalc_elecID>  elecIDSF;
@@ -124,19 +132,21 @@ class TTbarLJAnalysisLiteModule : public ModuleBASE {
   Event::Handle<TLorentzVector> h_lep1;
   Event::Handle<int>            h_lep1__pdgID;
   Event::Handle<int>            h_lep1__charge;
-  Event::Handle<float>          h_lep1__minDR_jet;
-  Event::Handle<float>          h_lep1__pTrel_jet;
+//  Event::Handle<float>          h_lep1__minDR_jet;
+//  Event::Handle<float>          h_lep1__pTrel_jet;
 
   Event::Handle<TLorentzVector> h_lep2;
   Event::Handle<int>            h_lep2__pdgID;
   Event::Handle<int>            h_lep2__charge;
-  Event::Handle<float>          h_lep2__minDR_jet;
-  Event::Handle<float>          h_lep2__pTrel_jet;
+//  Event::Handle<float>          h_lep2__minDR_jet;
+//  Event::Handle<float>          h_lep2__pTrel_jet;
   //
 
   // jet
   Event::Handle<TLorentzVector> h_jet1;
   Event::Handle<TLorentzVector> h_jet2;
+  Event::Handle<TLorentzVector> h_jet3;
+  Event::Handle<TLorentzVector> h_jet4;
 
   // MET
   Event::Handle<TLorentzVector> h_MET;
@@ -187,6 +197,8 @@ class TTbarLJAnalysisLiteModule : public ModuleBASE {
 
 TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule(uhh2::Context& ctx){
 
+
+
   //// CONFIGURATION
   const bool isMC = (ctx.get("dataset_type") == "MC");
 
@@ -219,7 +231,7 @@ TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule(uhh2::Context& ctx){
 
   const std::string& keyword = ctx.get("keyword");
 
-  float jet1_pt(-1.), jet2_pt(-1.), MET(-1.), HT_lep(-1.);
+  float jet1_pt(-1.), jet2_pt(-1.), jet3_pt(-1.), jet4_pt(-1.), MET(-1.), HT_lep(-1.);
   bool triangul_cut(false);
   bool topleppt_cut(false);
 
@@ -230,109 +242,130 @@ TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule(uhh2::Context& ctx){
 
     if(channel_ == muon){
 
-      lep1_pt_ =   0.;
+      lep1_pt_ =   22.;
+      lep1_eta_ = 2.1;
 
-      jet1_pt  = 150.;
-      jet2_pt  =  50.;
+      jet1_pt  = 25.;
+      jet2_pt  =  25.;
+      jet3_pt  = 25.;
+      jet4_pt  =  25.;
 
-      MET      =  50.;
-      HT_lep   = 150.;
+      MET      =  0.;
+      HT_lep   = 0.;
 
+     //  lep1_pt_ =   0.;
+
+     //  jet1_pt  = 150.;
+     //  jet2_pt  =  50.;
+
+     //  MET      =  50.;
+     //  HT_lep   = 150.;
       triangul_cut = false;
       topleppt_cut = false;
     }
     else if(channel_ == elec){
 
-      lep1_pt_ =   0.;
+      lep1_pt_ =   24.;
+      lep1_eta_ = 2.1;
 
-      jet1_pt  = 250.;
-      jet2_pt  =  70.;
+      jet1_pt  =   25.;
+      jet2_pt  =   25.;
+      jet3_pt  = 25.;
+      jet4_pt  =  25.;
 
-      MET      = 120.;
+      MET      =   0.;
       HT_lep   =   0.;
+  
+    //   lep1_pt_ =   0.;
+
+    //   jet1_pt  = 250.;
+    //   jet2_pt  =  70.;
+
+    //   MET      = 120.;
+    //   HT_lep   =   0.;
 
       triangul_cut = false;
       topleppt_cut = false;
     }
   }
-  else if(keyword == "T0_v02" || keyword == "T1_v02"){
+  // else if(keyword == "T0_v02" || keyword == "T1_v02"){
 
-    if     (keyword == "T0_v02") use_ttagging_ = false;
-    else if(keyword == "T1_v02") use_ttagging_ = true;
+  //   if     (keyword == "T0_v02") use_ttagging_ = false;
+  //   else if(keyword == "T1_v02") use_ttagging_ = true;
 
-    if(channel_ == muon){
+  //   if(channel_ == muon){
 
-      lep1_pt_ =   0.;
+  //     lep1_pt_ =   0.;
 
-      jet1_pt  = 150.;
-      jet2_pt  =  50.;
+  //     jet1_pt  = 150.;
+  //     jet2_pt  =  50.;
 
-      MET      =  50.;
-      HT_lep   = 150.;
+  //     MET      =  50.;
+  //     HT_lep   = 150.;
 
-      triangul_cut = false;
-      topleppt_cut = false;
-    }
-    else if(channel_ == elec){
+  //     triangul_cut = false;
+  //     topleppt_cut = false;
+  //   }
+  //   else if(channel_ == elec){
 
-      lep1_pt_ = 110.;
+  //     lep1_pt_ = 110.;
 
-      jet1_pt  = 150.;
-      jet2_pt  =  50.;
+  //     jet1_pt  = 150.;
+  //     jet2_pt  =  50.;
 
-      MET      = 100.;
-      HT_lep   =   0.;
+  //     MET      = 100.;
+  //     HT_lep   =   0.;
 
-      triangul_cut = false;
-      topleppt_cut = false;
-    }
-  }
-  else if(keyword == "T0_v03" || keyword == "T1_v03"){
+  //     triangul_cut = false;
+  //     topleppt_cut = false;
+  //   }
+  // }
+  // else if(keyword == "T0_v03" || keyword == "T1_v03"){
 
-    if     (keyword == "T0_v03") use_ttagging_ = false;
-    else if(keyword == "T1_v03") use_ttagging_ = true;
+  //   if     (keyword == "T0_v03") use_ttagging_ = false;
+  //   else if(keyword == "T1_v03") use_ttagging_ = true;
 
-    if(channel_ == muon){
+  //   if(channel_ == muon){
 
-      lep1_pt_ =   0.;
+  //     lep1_pt_ =   0.;
 
-      jet1_pt  = 250.;
-      jet2_pt  =  70.;
+  //     jet1_pt  = 250.;
+  //     jet2_pt  =  70.;
 
-      MET      = 120.;
-      HT_lep   =   0.;
+  //     MET      = 120.;
+  //     HT_lep   =   0.;
 
-      triangul_cut = false;
-      topleppt_cut = false;
-    }
-    else if(channel_ == elec){
+  //     triangul_cut = false;
+  //     topleppt_cut = false;
+  //   }
+  //   else if(channel_ == elec){
 
-      throw std::runtime_error("TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule -- undefined working-point for \""+keyword+"\" in \"elec\" channel");
-    }
-  }
-  else if(keyword == "T0_v04" || keyword == "T1_v04"){
+  //     throw std::runtime_error("TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule -- undefined working-point for \""+keyword+"\" in \"elec\" channel");
+  //   }
+  // }
+  // else if(keyword == "T0_v04" || keyword == "T1_v04"){
 
-    if     (keyword == "T0_v04") use_ttagging_ = false;
-    else if(keyword == "T1_v04") use_ttagging_ = true;
+  //   if     (keyword == "T0_v04") use_ttagging_ = false;
+  //   else if(keyword == "T1_v04") use_ttagging_ = true;
 
-    if(channel_ == muon){
+  //   if(channel_ == muon){
 
-      throw std::runtime_error("TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule -- undefined working-point for \""+keyword+"\" in \"muon\" channel");
-    }
-    else if(channel_ == elec){
+  //     throw std::runtime_error("TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule -- undefined working-point for \""+keyword+"\" in \"muon\" channel");
+  //   }
+  //   else if(channel_ == elec){
 
-      lep1_pt_ =   0.;
+  //     lep1_pt_ =   0.;
 
-      jet1_pt  = 250.;
-      jet2_pt  =  70.;
+  //     jet1_pt  = 250.;
+  //     jet2_pt  =  70.;
 
-      MET      =  50.;
-      HT_lep   =   0.;
+  //     MET      =  50.;
+  //     HT_lep   =   0.;
 
-      triangul_cut = false;
-      topleppt_cut = false;
-    }
-  }
+  //     triangul_cut = false;
+  //     topleppt_cut = false;
+  //   }
+  // }
   else throw std::runtime_error("TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule -- undefined \"keyword\" argument in .xml configuration file: "+keyword);
   //
 
@@ -350,16 +383,31 @@ TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule(uhh2::Context& ctx){
   //// OBJ CLEANING
   ////
 
-  //// EVENT SELECTION
-  jet2_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(jet2_pt, 2.4))));
-  jet1_sel.reset(new NJetSelection(1, -1, JetId(PtEtaCut(jet1_pt, 2.4))));
+  //  EVENT SELECTION
+    jet4_sel.reset(new NJetSelection(4, -1, JetId(PtEtaCut(jet4_pt, 2.4))));
+    jet3_sel.reset(new NJetSelection(3, -1, JetId(PtEtaCut(jet3_pt, 2.4))));
+    jet2_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(jet2_pt, 2.4))));
+    jet1_sel.reset(new NJetSelection(1, -1, JetId(PtEtaCut(jet1_pt, 2.4))));
+
 
   const std::string& trigger = ctx.get("trigger", "NULL");
   if(trigger != "NULL") trigger_sel.reset(new TriggerSelection(trigger));
   else                  trigger_sel.reset(new uhh2::AndSelection(ctx));
+  if (trigger=="HLT_IsoMu20_v*") {
+    const std::string& trigger2="HLT_IsoTkMu20_v*";
+    trigger2_sel.reset(new TriggerSelection(trigger2));
+    second_trigger_ = true;
+  }
+  else if (trigger=="HLT_IsoMu27_v*"){
+    const std::string& trigger2="HLT_IsoTkMu27_v*";
+    trigger2_sel.reset(new TriggerSelection(trigger2));
+    second_trigger_ = true;
+  }
+  else second_trigger_=false;
 
-  met_sel  .reset(new METCut  (MET   , uhh2::infinity));
-  htlep_sel.reset(new HTlepCut(HT_lep, uhh2::infinity));
+
+    met_sel  .reset(new METCut  (MET   , uhh2::infinity));
+    htlep_sel.reset(new HTlepCut(HT_lep, uhh2::infinity));
 
   if(triangul_cut){
 
@@ -424,32 +472,36 @@ TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule(uhh2::Context& ctx){
   ////
 
   if(topleppt_cut){
-
     if     (channel_ == elec) topleppt_sel.reset(new LeptonicTopPtCut(ctx, 140., uhh2::infinity, ttbar_hyps_label, ttbar_chi2_label));
     else if(channel_ == muon) topleppt_sel.reset(new uhh2::AndSelection(ctx));
   }
   else topleppt_sel.reset(new uhh2::AndSelection(ctx));
 
-  chi2_sel.reset(new HypothesisDiscriminatorCut(ctx,  0., 30., ttbar_hyps_label, ttbar_chi2_label));
+   chi2_sel.reset(new HypothesisDiscriminatorCut(ctx,  0., 30., ttbar_hyps_label, ttbar_chi2_label));
+  
 
   //// HISTS
 
   std::vector<std::string> htags_1({
 
+    "before_sel",
+    "trigger",
+    "jet4",
+    "jet3",
     "jet2",
     "jet1",
-    "trigger",
     "met",
     "htlep",
     "triangc",
     "topleppt",
+    "after_cut",
   });
 
   for(const auto& tag : htags_1){
 
     book_HFolder(tag, new TTbarLJHists(ctx, tag, ttag_ID_, ttag_minDR_jet_));
   }
-  //
+  
 
   std::vector<std::string> htags_2({
 
@@ -551,7 +603,9 @@ TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule(uhh2::Context& ctx){
   //
 
   // top-pt reweighting
-  topptREWGT.reset(new TopPtReweight(ctx, 0.156, -0.00137, ttbar_gen_label, "wgtMC__topptREWGT_ct"));
+  if(ctx.get("dataset_version").find("TT") != std::string::npos){
+    topptREWGT.reset(new TopPtReweight(ctx, 0.156, -0.00137, ttbar_gen_label, "wgtMC__topptREWGT_ct"));
+  }
   //
 
   // W+jets reweighting (NLO/LO k-factors)
@@ -598,19 +652,21 @@ TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule(uhh2::Context& ctx){
   h_lep1            = ctx.declare_event_output<TLorentzVector>("lep1");
   h_lep1__pdgID     = ctx.declare_event_output<int>           ("lep1__pdgID");
   h_lep1__charge    = ctx.declare_event_output<int>           ("lep1__charge");
-  h_lep1__minDR_jet = ctx.declare_event_output<float>         ("lep1__minDR_jet");
-  h_lep1__pTrel_jet = ctx.declare_event_output<float>         ("lep1__pTrel_jet");
+//  h_lep1__minDR_jet = ctx.declare_event_output<float>         ("lep1__minDR_jet");
+//  h_lep1__pTrel_jet = ctx.declare_event_output<float>         ("lep1__pTrel_jet");
 
   h_lep2            = ctx.declare_event_output<TLorentzVector>("lep2");
   h_lep2__pdgID     = ctx.declare_event_output<int>           ("lep2__pdgID");
   h_lep2__charge    = ctx.declare_event_output<int>           ("lep2__charge");
-  h_lep2__minDR_jet = ctx.declare_event_output<float>         ("lep2__minDR_jet");
-  h_lep2__pTrel_jet = ctx.declare_event_output<float>         ("lep2__pTrel_jet");
+//  h_lep2__minDR_jet = ctx.declare_event_output<float>         ("lep2__minDR_jet");
+//  h_lep2__pTrel_jet = ctx.declare_event_output<float>         ("lep2__pTrel_jet");
   //
 
   // jet
   h_jet1            = ctx.declare_event_output<TLorentzVector>("jet1");
   h_jet2            = ctx.declare_event_output<TLorentzVector>("jet2");
+  h_jet3            = ctx.declare_event_output<TLorentzVector>("jet3");
+  h_jet4            = ctx.declare_event_output<TLorentzVector>("jet4");
   //
 
   // MET
@@ -661,6 +717,8 @@ TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule(uhh2::Context& ctx){
 }
 
 bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
+
+  HFolder("before_sel")->fill(event);
 
   //// COMMON MODULES
 
@@ -759,11 +817,13 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
     }
 
     // top-pt reweighting
-    topptREWGT->process(event);
+    if(topptREWGT.get()){
+      topptREWGT->process(event);
     float w_topptREWGT_ct = event.get(h_wgtMC__topptREWGT_ct);
     //apply twice the shift as uncertainty
     w_topptREWGT_dn = w_topptREWGT_ct*w_topptREWGT_ct;
     w_topptREWGT_up = 1;
+    }
     //
 
     // W+jets reweighting
@@ -780,7 +840,31 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
 
   ////
 
+
+
   //// LEPTON SELECTION
+
+
+  // lepton multiplicity
+  int lepN(-1);
+  if     (channel_ == muon) lepN = int(event.muons    ->size());
+  else if(channel_ == elec) lepN = int(event.electrons->size());
+  //  if(!(lepN >= 1)) return false;
+   if(!(lepN == 1)) return false;
+  //
+
+  //// HLT selection
+  const bool pass_trigger = trigger_sel->passes(event);
+  if (second_trigger_) {
+    const bool pass_trigger2 = trigger2_sel->passes(event);
+    if(!pass_trigger && !pass_trigger2) return false;
+    if(lepN == 1) HFolder("trigger")->fill(event);
+  }
+  else {
+    if(!pass_trigger) return false;
+    if(lepN == 1) HFolder("trigger")->fill(event);
+  }
+  ////
 
   // OF lepton veto
   bool pass_lepV(0);
@@ -789,21 +873,27 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
   if(!pass_lepV) return false;
   //
 
-  // lepton multiplicity
-  int lepN(-1);
-  if     (channel_ == muon) lepN = int(event.muons    ->size());
-  else if(channel_ == elec) lepN = int(event.electrons->size());
-  if(!(lepN >= 1)) return false;
-  //
-
   // pt-leading lepton selection
   const Particle* lep1 = leading_lepton(event);
   if(!(lep1->pt() > lep1_pt_)) return false;
+  // eta-leading lepton selection
+  if(lep1->eta() > lep1_eta_) return false;
+
   //
 
   ////
 
   //// JET selection
+
+ /* 4th AK4 jet selection */
+  const bool pass_jet4 = jet4_sel->passes(event);
+  if(!pass_jet4) return false;
+  if(lepN == 1) HFolder("jet4")->fill(event);
+
+ /* 3rd AK4 jet selection */
+  const bool pass_jet3 = jet3_sel->passes(event);
+  if(!pass_jet3) return false;
+  if(lepN == 1) HFolder("jet3")->fill(event);
 
   /* 2nd AK4 jet selection */
   const bool pass_jet2 = jet2_sel->passes(event);
@@ -817,11 +907,7 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
 
   ////
 
-  //// HLT selection
-  const bool pass_trigger = trigger_sel->passes(event);
-  if(!pass_trigger) return false;
-  if(lepN == 1) HFolder("trigger")->fill(event);
-  ////
+
 
   if(channel_ == elec) event.weight *= w_elecHLTSF_ct;
 
@@ -847,14 +933,13 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
 
   /* TOPTAG-EVENT boolean */
   const bool pass_ttagevt = ttagevt_sel->passes(event) && use_ttagging_;
-
   const std::string ttag_posx = (pass_ttagevt ? "t1" : "t0");
   /************************/
 
   reco_primlep->process(event);
 
   if(!pass_ttagevt){ ttbar_reco__ttag0->process(event); ttbar_chi2__ttag0->process(event); }
-  else             { ttbar_reco__ttag1->process(event); ttbar_chi2__ttag1->process(event); }
+  else             { ttbar_reco__ttag1->process(event); ttbar_chi2__ttag1->process(event);}
 
   std::vector<ReconstructionHypothesis>& ttbar_hyps = event.get(h_ttbar_hyps);
 
@@ -865,6 +950,8 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
   if(!pass_topleppt) return false;
   if(lepN == 1) HFolder("topleppt")->fill(event);
   ////
+
+
 
   //// FINAL selection
 
@@ -902,11 +989,12 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
   const int btagN = jetbtagN + subjbtagN;
 
   const std::string btag_posx = (btagN >= 2 ? "b2" : (btagN >= 1 ? "b1" : "b0"));
+  //only events with at least two b-tag
+  //  if(btagN < 2) return false;
   /******************/
 
   /* CHI2 selection */
   const bool pass_chi2 = chi2_sel->passes(event);
-
   const std::string chi2_posx = pass_chi2 ? "chi2" : "antichi2";
   /******************/
 
@@ -987,9 +1075,9 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
 
   event.set(h_ttagevt, pass_ttagevt);
 
+
   int ttgen_decay(-1);
   if(!event.isRealData){
-
     const auto& ttgen = event.get(h_ttbar_gen);
 
     if     (ttgen.DecayChannel() == TTbarGen::e_notfound) ttgen_decay = -1;
@@ -1018,38 +1106,38 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
 
   TLorentzVector lep1__p4(0.,0.,0.,0.), lep2__p4(0.,0.,0.,0.);
   int   lep1__pdgID(0), lep1__charge(0), lep2__pdgID(0), lep2__charge(0);
-  float lep1__minDR_jet(-1.), lep1__pTrel_jet(-1.), lep2__minDR_jet(-1.), lep2__pTrel_jet(-1.);
+//  float lep1__minDR_jet(-1.), lep1__pTrel_jet(-1.), lep2__minDR_jet(-1.), lep2__pTrel_jet(-1.);
   if(channel_ == muon){
 
     lep1__pdgID     = lep1->charge() * -13;
     lep1__charge    = lep1->charge();
-    lep1__minDR_jet = ((Muon*) lep1)->get_tag(Muon::twodcut_dRmin);
-    lep1__pTrel_jet = ((Muon*) lep1)->get_tag(Muon::twodcut_pTrel);
+//    lep1__minDR_jet = ((Muon*) lep1)->get_tag(Muon::twodcut_dRmin);
+//    lep1__pTrel_jet = ((Muon*) lep1)->get_tag(Muon::twodcut_pTrel);
     lep1__p4        = TLorentzVector(lep1->v4().Px(), lep1->v4().Py(), lep1->v4().Pz(), lep1->v4().E());
 
     if(lep2){
 
       lep2__pdgID     = lep2->charge() * -13;
       lep2__charge    = lep2->charge();
-      lep2__minDR_jet = ((Muon*) lep2)->get_tag(Muon::twodcut_dRmin);
-      lep2__pTrel_jet = ((Muon*) lep2)->get_tag(Muon::twodcut_pTrel);
+ //     lep2__minDR_jet = ((Muon*) lep2)->get_tag(Muon::twodcut_dRmin);
+ //     lep2__pTrel_jet = ((Muon*) lep2)->get_tag(Muon::twodcut_pTrel);
       lep2__p4        = TLorentzVector(lep2->v4().Px(), lep2->v4().Py(), lep2->v4().Pz(), lep2->v4().E());
     }
   }
   else if(channel_ == elec){
-
     lep1__pdgID     = lep1->charge() * -11;
     lep1__charge    = lep1->charge();
-    lep1__minDR_jet = ((Electron*) lep1)->get_tag(Electron::twodcut_dRmin);
-    lep1__pTrel_jet = ((Electron*) lep1)->get_tag(Electron::twodcut_pTrel);
-    lep1__p4        = TLorentzVector(lep1->v4().Px(), lep1->v4().Py(), lep1->v4().Pz(), lep1->v4().E());
+//    lep1__minDR_jet = ((Electron*) lep1)->get_tag(Electron::twodcut_dRmin);
+//    lep1__pTrel_jet = ((Electron*) lep1)->get_tag(Electron::twodcut_pTrel);
+     lep1__p4        = TLorentzVector(lep1->v4().Px(), lep1->v4().Py(), lep1->v4().Pz(), lep1->v4().E());
+
 
     if(lep2){
 
       lep2__pdgID     = lep2->charge() * -11;
       lep2__charge    = lep2->charge();
-      lep2__minDR_jet = ((Electron*) lep2)->get_tag(Electron::twodcut_dRmin);
-      lep2__pTrel_jet = ((Electron*) lep2)->get_tag(Electron::twodcut_pTrel);
+//      lep2__minDR_jet = ((Electron*) lep2)->get_tag(Electron::twodcut_dRmin);
+//      lep2__pTrel_jet = ((Electron*) lep2)->get_tag(Electron::twodcut_pTrel);
       lep2__p4        = TLorentzVector(lep2->v4().Px(), lep2->v4().Py(), lep2->v4().Pz(), lep2->v4().E());
     }
   }
@@ -1057,24 +1145,31 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
   event.set(h_lep1           , lep1__p4);
   event.set(h_lep1__pdgID    , lep1__pdgID);
   event.set(h_lep1__charge   , lep1__charge);
-  event.set(h_lep1__minDR_jet, lep1__minDR_jet);
-  event.set(h_lep1__pTrel_jet, lep1__pTrel_jet);
+//  event.set(h_lep1__minDR_jet, lep1__minDR_jet);
+//  event.set(h_lep1__pTrel_jet, lep1__pTrel_jet);
 
   event.set(h_lep2           , lep2__p4);
   event.set(h_lep2__pdgID    , lep2__pdgID);
   event.set(h_lep2__charge   , lep2__charge);
-  event.set(h_lep2__minDR_jet, lep2__minDR_jet);
-  event.set(h_lep2__pTrel_jet, lep2__pTrel_jet);
+//  event.set(h_lep2__minDR_jet, lep2__minDR_jet);
+//  event.set(h_lep2__pTrel_jet, lep2__pTrel_jet);
+
   //
 
   // jet
-  if(!(event.jets->size() >= 2)) throw std::runtime_error("TTbarLJAnalysisLiteModule::process -- logic error: jet multiplicity < 2 ("+std::to_string(event.jets->size())+")");
+  // if(!(event.jets->size() >= 2)) throw std::runtime_error("TTbarLJAnalysisLiteModule::process -- logic error: jet multiplicity < 2 ("+std::to_string(event.jets->size())+")");
+  if(!(event.jets->size() >= 4)) return false;
+  //throw std::runtime_error("TTbarLJAnalysisLiteModule::process -- logic error: jet multiplicity < 4 ("+std::to_string(event.jets->size())+")");
 
   TLorentzVector jet1__p4(event.jets->at(0).v4().Px(), event.jets->at(0).v4().Py(), event.jets->at(0).v4().Pz(), event.jets->at(0).v4().E());
   TLorentzVector jet2__p4(event.jets->at(1).v4().Px(), event.jets->at(1).v4().Py(), event.jets->at(1).v4().Pz(), event.jets->at(1).v4().E());
+  TLorentzVector jet3__p4(event.jets->at(2).v4().Px(), event.jets->at(2).v4().Py(), event.jets->at(2).v4().Pz(), event.jets->at(2).v4().E());
+  TLorentzVector jet4__p4(event.jets->at(3).v4().Px(), event.jets->at(3).v4().Py(), event.jets->at(3).v4().Pz(), event.jets->at(3).v4().E());
 
   event.set(h_jet1           , jet1__p4);
   event.set(h_jet2           , jet2__p4);
+  event.set(h_jet3           , jet3__p4);
+  event.set(h_jet4           , jet4__p4);
   //
 
   // MET
@@ -1097,7 +1192,7 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
   event.set(h_rec_tlep, TLorentzVector(tlep.Px(), tlep.Py(), tlep.Pz(), tlep.E()));
   event.set(h_rec_thad, TLorentzVector(thad.Px(), thad.Py(), thad.Pz(), thad.E()));
   //
-
+ 
   // weight
   event.set(h_wgtMC__GEN         , w_GEN);
 
@@ -1124,6 +1219,8 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
 
   event.set(h_wgtMC__topptREWGT_up , w_topptREWGT_up);
   event.set(h_wgtMC__topptREWGT_dn , w_topptREWGT_dn);
+  if(!topptREWGT.get())
+    event.set(h_wgtMC__topptREWGT_ct , 1.);
 
   event.set(h_wgtMC__wjetsREWGT_ct , w_wjetsREWGT_ct);
 
@@ -1131,6 +1228,8 @@ bool TTbarLJAnalysisLiteModule::process(uhh2::Event& event){
   //
 
   ////
+
+  HFolder("after_cut")->fill(event);
 
   return true;
 }

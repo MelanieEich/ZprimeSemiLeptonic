@@ -40,7 +40,7 @@ class TTbarLJSkimmingModule : public ModuleBASE {
   std::unique_ptr<JetCorrector>                    jet_corrector;
   std::unique_ptr<GenericJetResolutionSmearer>     jetER_smearer;
   std::unique_ptr<JetLeptonCleaner_by_KEYmatching> jetlepton_cleaner;
-  std::unique_ptr<JetCleaner>                      jet_cleaner1;
+  //  std::unique_ptr<JetCleaner>                      jet_cleaner1;
   std::unique_ptr<JetCleaner>                      jet_cleaner2;
 
   std::unique_ptr<JetCleaner>                  topjet_IDcleaner;
@@ -57,11 +57,13 @@ class TTbarLJSkimmingModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> genmttbar_sel;
   std::unique_ptr<uhh2::Selection> genflavor_sel;
 
+  std::unique_ptr<uhh2::Selection> jet4_sel;
+  std::unique_ptr<uhh2::Selection> jet3_sel;
   std::unique_ptr<uhh2::Selection> jet2_sel;
   std::unique_ptr<uhh2::Selection> jet1_sel;
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> htlep_sel;
-  std::unique_ptr<uhh2::Selection> twodcut_sel;
+  //  std::unique_ptr<uhh2::Selection> twodcut_sel;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 };
@@ -74,20 +76,26 @@ TTbarLJSkimmingModule::TTbarLJSkimmingModule(uhh2::Context& ctx){
   const std::string& keyword = ctx.get("keyword");
 
   ElectronId eleID;
-  float ele_pt(-1.), jet1_pt(-1.), jet2_pt(-1.), MET(-1.), HT_lep(-1.);
+  float ele_pt(-1.), muon_pt(-1.), jet1_pt(-1.), jet2_pt(-1.),jet3_pt(-1.), jet4_pt(-1.), MET(-1.), HT_lep(-1.);
   bool use_miniiso(false);
 
   if(keyword == "v01"){
-
-    ele_pt = 50.;
-    eleID  = ElectronID_Spring15_25ns_tight_noIso;
+    //ele_pt and muon_pt set to 5 GeV
+    ele_pt = 24.;
+    muon_pt = 22.;
+    eleID  = ElectronID_Spring15_25ns_tight;
 
     use_miniiso = false;
 
-    jet1_pt = 150.;
-    jet2_pt =  50.;
+    //    jet1_pt = 150.;
+    //    jet2_pt =  50.;
+    jet1_pt = 25.;
+    jet2_pt =  25.;
+    jet3_pt =  25.;
+    jet4_pt =  25.;
 
-    MET     =  50.;
+    //    MET     =  50.;
+    MET     =  0.;
     HT_lep  =   0.;
   }
   else throw std::runtime_error("TTbarLJSkimmingModule::TTbarLJSkimmingModule -- undefined \"keyword\" argument in .xml configuration file: "+keyword);
@@ -133,8 +141,8 @@ TTbarLJSkimmingModule::TTbarLJSkimmingModule(uhh2::Context& ctx){
   ////
 
   //// OBJ CLEANING
-  const     MuonId muoSR(AndId<Muon>    (PtEtaCut  (50.   , 2.1), MuonIDMedium()));
-  const ElectronId eleSR(AndId<Electron>(PtEtaSCCut(ele_pt, 2.5), eleID));
+  const     MuonId muoSR(AndId<Muon>(MuonIso(), (AndId<Muon>    (PtEtaCut  (muon_pt,    2.1), MuonIDMedium()))));
+  const ElectronId eleSR(AndId<Electron>(PtEtaSCCut(ele_pt,     2.1), eleID));
 
   if(use_miniiso){
 
@@ -167,8 +175,8 @@ TTbarLJSkimmingModule::TTbarLJSkimmingModule(uhh2::Context& ctx){
   jet_corrector.reset(new JetCorrector(ctx, JEC_AK4));
   if(isMC) jetER_smearer.reset(new GenericJetResolutionSmearer(ctx));
   jetlepton_cleaner.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4));
-  jet_cleaner1.reset(new JetCleaner(ctx, 15., 3.0));
-  jet_cleaner2.reset(new JetCleaner(ctx, 30., 2.4));
+  //  jet_cleaner1.reset(new JetCleaner(ctx, 15., 3.0));
+  jet_cleaner2.reset(new JetCleaner(ctx, 25., 2.4));
 
   topjet_IDcleaner.reset(new JetCleaner(ctx, jetID));
   topjet_corrector.reset(new TopJetCorrector(ctx, JEC_AK8));
@@ -182,25 +190,31 @@ TTbarLJSkimmingModule::TTbarLJSkimmingModule(uhh2::Context& ctx){
   ////
 
   //// EVENT SELECTION
+  jet4_sel.reset(new NJetSelection(4, -1, JetId(PtEtaCut(jet4_pt, 2.4))));
+  jet3_sel.reset(new NJetSelection(3, -1, JetId(PtEtaCut(jet3_pt, 2.4))));
   jet2_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(jet2_pt, 2.4))));
   jet1_sel.reset(new NJetSelection(1, -1, JetId(PtEtaCut(jet1_pt, 2.4))));
 
   met_sel  .reset(new METCut  (MET   , uhh2::infinity));
   htlep_sel.reset(new HTlepCut(HT_lep, uhh2::infinity));
 
-  if(use_miniiso) twodcut_sel.reset(new TwoDCut1(-1, 20.));
-  else            twodcut_sel.reset(new TwoDCut1(.4, 20.));
+  // if(use_miniiso) twodcut_sel.reset(new TwoDCut1(-1, 20.));
+  // else            twodcut_sel.reset(new TwoDCut1(.4, 20.));
   ////
 
   //// HISTS
   std::vector<std::string> htags_1({
 
+    "before_sel",
     "lep1",
+    "jet4",
+    "jet3",
     "jet2",
     "jet1",
     "met",
     "htlep",
-    "twodcut",
+      //    "twodcut",
+    "after_cut",
   });
 
   for(const auto& tag : htags_1){
@@ -211,6 +225,8 @@ TTbarLJSkimmingModule::TTbarLJSkimmingModule(uhh2::Context& ctx){
 }
 
 bool TTbarLJSkimmingModule::process(uhh2::Event& event){
+
+  HFolder("before_sel")->fill(event);
 
   //// COMMON MODULES
 
@@ -242,7 +258,8 @@ bool TTbarLJSkimmingModule::process(uhh2::Event& event){
   eleSR_cleaner->process(event);
   sort_by_pt<Electron>(*event.electrons);
 
-  const bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
+  //  const bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
+  const bool pass_lep1 = ((event.muons->size() == 1) || (event.electrons->size() == 1));
   if(!pass_lep1) return false;
   HFolder("lep1")->fill(event);
   ////
@@ -253,30 +270,32 @@ bool TTbarLJSkimmingModule::process(uhh2::Event& event){
   jet_corrector->process(event);
   if(jetER_smearer.get()) jetER_smearer->process(event);
   jetlepton_cleaner->process(event);
-  jet_cleaner1->process(event);
-  sort_by_pt<Jet>(*event.jets);
+  // jet_cleaner1->process(event);
+  // sort_by_pt<Jet>(*event.jets);
 
-  /* lepton-2Dcut variables */
-  const bool pass_twodcut = twodcut_sel->passes(event); {
 
-    for(auto& muo : *event.muons){
+  
+  // /* lepton-2Dcut variables */  
+  // const bool pass_twodcut = twodcut_sel->passes(event); {
 
-      float    dRmin, pTrel;
-      std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
+  //   for(auto& muo : *event.muons){
 
-      muo.set_tag(Muon::twodcut_dRmin, dRmin);
-      muo.set_tag(Muon::twodcut_pTrel, pTrel);
-    }
+  //    float    dRmin, pTrel;
+  //     std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
 
-    for(auto& ele : *event.electrons){
+  //     muo.set_tag(Muon::twodcut_dRmin, dRmin);
+  //     muo.set_tag(Muon::twodcut_pTrel, pTrel);
+  //   }
 
-      float    dRmin, pTrel;
-      std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
+  //   for(auto& ele : *event.electrons){
 
-      ele.set_tag(Electron::twodcut_dRmin, dRmin);
-      ele.set_tag(Electron::twodcut_pTrel, pTrel);
-    }
-  }
+  //     float    dRmin, pTrel;
+  //     std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
+
+  //     ele.set_tag(Electron::twodcut_dRmin, dRmin);
+  //     ele.set_tag(Electron::twodcut_pTrel, pTrel);
+  //   }
+  // }
 
   jet_cleaner2->process(event);
   sort_by_pt<Jet>(*event.jets);
@@ -289,34 +308,44 @@ bool TTbarLJSkimmingModule::process(uhh2::Event& event){
   topjet_cleaner->process(event);
   sort_by_pt<TopJet>(*event.topjets);
 
-  /* 2nd AK4 jet selection */
+  /*  4th AK4 jet selection */
+  const bool pass_jet4 = jet4_sel->passes(event);
+  if(!pass_jet4) return false;
+  HFolder("jet4")->fill(event);
+
+  /*  3rd AK4 jet selection */
+  const bool pass_jet3 = jet3_sel->passes(event);
+  if(!pass_jet3) return false;
+  HFolder("jet3")->fill(event);
+
+  /*  2nd AK4 jet selection */
   const bool pass_jet2 = jet2_sel->passes(event);
   if(!pass_jet2) return false;
   HFolder("jet2")->fill(event);
+ 
+  /*  1st AK4 jet selection */
+   const bool pass_jet1 = jet1_sel->passes(event);
+   if(!pass_jet1) return false;
+   HFolder("jet1")->fill(event);
+   
+ 
+   /*  MET selection */
+   const bool pass_met = met_sel->passes(event);
+   if(!pass_met) return false;
+   HFolder("met")->fill(event);
+   
 
-  /* 1st AK4 jet selection */
-  const bool pass_jet1 = jet1_sel->passes(event);
-  if(!pass_jet1) return false;
-  HFolder("jet1")->fill(event);
-  ////
+   /*   HT_lep selection */
+   const bool pass_htlep = htlep_sel->passes(event);
+   if(!pass_htlep) return false;
+   HFolder("htlep")->fill(event);
+   
 
-  //// MET selection
-  const bool pass_met = met_sel->passes(event);
-  if(!pass_met) return false;
-  HFolder("met")->fill(event);
-  ////
-
-  //// HT_lep selection
-  const bool pass_htlep = htlep_sel->passes(event);
-  if(!pass_htlep) return false;
-  HFolder("htlep")->fill(event);
-  ////
-
-  //// LEPTON-2Dcut selection
-  if(!pass_twodcut) return false;
-  HFolder("twodcut")->fill(event);
-  ////
-
+   // /*  LEPTON-2Dcut selection */
+   // if(!pass_twodcut) return false;
+   // HFolder("twodcut")->fill(event);
+   
+  HFolder("after_cut")->fill(event);
   return true;
 }
 

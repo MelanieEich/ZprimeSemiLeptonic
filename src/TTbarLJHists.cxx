@@ -24,13 +24,13 @@ void TTbarLJHists::init(){
   book_TH1F("wgt", 120, -6, 6);
 
   // PV
-  book_TH1F("pvN", 120, 0, 120);
+  book_TH1F("pvN", 20, 0, 40);
 
   // MUON
   book_TH1F("muoN"                 , 20, 0, 20);
 
   book_TH1F("muo1__charge"         , 5, -2, 3);
-  book_TH1F("muo1__pt"             , 360, 0, 1800);
+  book_TH1F("muo1__pt"             , 20, 0, 400);
   book_TH1F("muo1__eta"            , 60, -3, 3);
   book_TH1F("muo1__phi"            , 60, -3.15, 3.15);
   book_TH1F("muo1__pfIso_dbeta"    , 60, 0, 3);
@@ -61,7 +61,7 @@ void TTbarLJHists::init(){
   book_TH1F("eleN"                 , 20, 0, 20);
 
   book_TH1F("ele1__charge"         , 5, -2, 3);
-  book_TH1F("ele1__pt"             , 360, 0, 1800);
+  book_TH1F("ele1__pt"             , 20, 0, 400);
   book_TH1F("ele1__eta"            , 60, -3, 3);
   book_TH1F("ele1__etaSC"          , 60, -3, 3);
   book_TH1F("ele1__phi"            , 60, -3.15, 3.15);
@@ -98,34 +98,43 @@ void TTbarLJHists::init(){
   book_TH1F("jetN__pt150_eta2p4", 20, 0, 20);
   book_TH1F("jetN__pt200_eta2p4", 20, 0, 20);
   book_TH1F("jetN__pt250_eta2p4", 20, 0, 20);
-  book_TH1F("jetN__CSVL"        , 10, 0, 10);
-  book_TH1F("jetN__CSVM"        , 10, 0, 10);
-  book_TH1F("jetN__CSVT"        , 10, 0, 10);
+  book_TH1F("jetN__CSVL"        , 7, 0, 7);
+  book_TH1F("jetN__CSVM"        , 7, 0, 7);
+  book_TH1F("jetN__CSVT"        , 7, 0, 7);
 
   book_TH1F("jetA__maxCSV1", 120, 0, 1.2);
   book_TH1F("jetA__maxCSV2", 120, 0, 1.2);
   book_TH1F("jetA__maxCSV3", 120, 0, 1.2);
+  book_TH1F("jetA__maxCSV4", 120, 0, 1.2);
+  book_TH1F("jetA__maxCSV5", 120, 0, 1.2);
+  book_TH1F("jetA__maxCSV6", 120, 0, 1.2);
 
-  book_TH1F("jet1__pt" , 180, 0, 1800);
+  book_TH1F("jet1__pt" , 25, 0, 600);
   book_TH1F("jet1__eta", 60, -3, 3);
   book_TH1F("jet1__phi", 60, -3.15, 3.15);
   book_TH1F("jet1__M"  , 360, 0, 360);
   book_TH1F("jet1__CSV", 120, 0, 1.2);
 
-  book_TH1F("jet2__pt" , 180, 0, 1800);
+  book_TH1F("jet2__pt" , 25, 0, 600);
   book_TH1F("jet2__eta", 60, -3, 3);
   book_TH1F("jet2__phi", 60, -3.15, 3.15);
   book_TH1F("jet2__M"  , 360, 0, 360);
   book_TH1F("jet2__CSV", 120, 0, 1.2);
 
-  book_TH1F("jet3__pt" , 180,  0, 1800);
+  book_TH1F("jet3__pt" , 90,  0, 900);
   book_TH1F("jet3__eta", 60, -3, 3);
   book_TH1F("jet3__phi", 60, -3.15, 3.15);
   book_TH1F("jet3__M"  , 360, 0, 360);
   book_TH1F("jet3__CSV", 120, 0, 1.2);
 
+  book_TH1F("jet4__pt" , 90,  0, 900);
+  book_TH1F("jet4__eta", 60, -3, 3);
+  book_TH1F("jet4__phi", 60, -3.15, 3.15);
+  book_TH1F("jet4__M"  , 360, 0, 360);
+  book_TH1F("jet4__CSV", 120, 0, 1.2);
+
   // TOPJET
-  book_TH1F("topjetN", 20, 0, 20);
+  book_TH1F("topjetN", 5, 0, 5);
 
   book_TH1F("topjet1__pt" , 180,  0, 1800);
   book_TH1F("topjet1__eta", 60, -3, 3);
@@ -136,49 +145,49 @@ void TTbarLJHists::init(){
   book_TH1F("topjet2__phi", 60, -3.15, 3.15);
   book_TH1F("topjet2__CSV", 120, 0, 1.2);
 
-  // TOPTAG
-  book_TH1F("toptagN"              , 20, 0, 20);
+  // // TOPTAG
+  // book_TH1F("toptagN"              , 20, 0, 20);
 
-  const std::vector<std::string> htags_ETA({"", "_etaLO", "_etaHI"});
+  // const std::vector<std::string> htags_ETA({"", "_etaLO", "_etaHI"});
 
-  for(const auto& eta : htags_ETA){
+  // for(const auto& eta : htags_ETA){
 
-    book_TH1F("toptag1"+eta+"__pt"          , 180, 0, 1800);
-    book_TH1F("toptag1"+eta+"__eta"         , 60, -3, 3);
-    book_TH1F("toptag1"+eta+"__phi"         , 60, -3.15, 3.15);
-    book_TH1F("toptag1"+eta+"__M"           , 360, 90, 450);
-    book_TH1F("toptag1"+eta+"__Mgro"        , 360, 90, 450);
-    book_TH1F("toptag1"+eta+"__Mpru"        , 360, 90, 450);
-    book_TH1F("toptag1"+eta+"__Msdp"        , 360, 90, 450);
-    book_TH1F("toptag1"+eta+"__mmin"        , 40, 0, 200);
-    book_TH1F("toptag1"+eta+"__tau2"        , 24, 0, 1.2);
-    book_TH1F("toptag1"+eta+"__tau3"        , 24, 0, 1.2);
-    book_TH1F("toptag1"+eta+"__tau32"       , 24, 0, 1.2);
-    book_TH1F("toptag1"+eta+"__CSV"         , 120, 0, 1.2);
-    book_TH1F("toptag1"+eta+"__subjN"       , 4, 2, 6);
-    book_TH1F("toptag1"+eta+"__subj1__pt"   , 180, 0, 1800);
-    book_TH1F("toptag1"+eta+"__subj1__eta"  , 60, -3, 3);
-    book_TH1F("toptag1"+eta+"__subj2__pt"   , 180, 0, 900);
-    book_TH1F("toptag1"+eta+"__subj2__eta"  , 60, -3, 3);
-    book_TH1F("toptag1"+eta+"__subj3__pt"   , 180, 0, 900);
-    book_TH1F("toptag1"+eta+"__subj3__eta"  , 60, -3, 3);
-    book_TH1F("toptag1"+eta+"__subj_minDR"  , 20, 0, 2);
-    book_TH1F("toptag1"+eta+"__subj_maxCSV1", 120, 0, 1.2);
-    book_TH1F("toptag1"+eta+"__subj_maxCSV2", 120, 0, 1.2);
-    book_TH1F("toptag1"+eta+"__subj_maxCSV3", 120, 0, 1.2);
-  }
+  //   book_TH1F("toptag1"+eta+"__pt"          , 180, 0, 1800);
+  //   book_TH1F("toptag1"+eta+"__eta"         , 60, -3, 3);
+  //   book_TH1F("toptag1"+eta+"__phi"         , 60, -3.15, 3.15);
+  //   book_TH1F("toptag1"+eta+"__M"           , 360, 90, 450);
+  //   book_TH1F("toptag1"+eta+"__Mgro"        , 360, 90, 450);
+  //   book_TH1F("toptag1"+eta+"__Mpru"        , 360, 90, 450);
+  //   book_TH1F("toptag1"+eta+"__Msdp"        , 360, 90, 450);
+  //   book_TH1F("toptag1"+eta+"__mmin"        , 40, 0, 200);
+  //   book_TH1F("toptag1"+eta+"__tau2"        , 24, 0, 1.2);
+  //   book_TH1F("toptag1"+eta+"__tau3"        , 24, 0, 1.2);
+  //   book_TH1F("toptag1"+eta+"__tau32"       , 24, 0, 1.2);
+  //   book_TH1F("toptag1"+eta+"__CSV"         , 120, 0, 1.2);
+  //   book_TH1F("toptag1"+eta+"__subjN"       , 4, 2, 6);
+  //   book_TH1F("toptag1"+eta+"__subj1__pt"   , 180, 0, 1800);
+  //   book_TH1F("toptag1"+eta+"__subj1__eta"  , 60, -3, 3);
+  //   book_TH1F("toptag1"+eta+"__subj2__pt"   , 180, 0, 900);
+  //   book_TH1F("toptag1"+eta+"__subj2__eta"  , 60, -3, 3);
+  //   book_TH1F("toptag1"+eta+"__subj3__pt"   , 180, 0, 900);
+  //   book_TH1F("toptag1"+eta+"__subj3__eta"  , 60, -3, 3);
+  //   book_TH1F("toptag1"+eta+"__subj_minDR"  , 20, 0, 2);
+  //   book_TH1F("toptag1"+eta+"__subj_maxCSV1", 120, 0, 1.2);
+  //   book_TH1F("toptag1"+eta+"__subj_maxCSV2", 120, 0, 1.2);
+  //   book_TH1F("toptag1"+eta+"__subj_maxCSV3", 120, 0, 1.2);
+  // }
 
-  book_TH1F("toptag2__pt"          , 180, 0, 1800);
-  book_TH1F("toptag2__eta"         , 60, -3, 3);
-  book_TH1F("toptag2__phi"         , 60, -3.15, 3.15);
-  book_TH1F("toptag2__M"           , 360, 90, 450);
-  book_TH1F("toptag2__CSV"         , 120, 0, 1.2);
+  // book_TH1F("toptag2__pt"          , 180, 0, 1800);
+  // book_TH1F("toptag2__eta"         , 60, -3, 3);
+  // book_TH1F("toptag2__phi"         , 60, -3.15, 3.15);
+  // book_TH1F("toptag2__M"           , 360, 90, 450);
+  // book_TH1F("toptag2__CSV"         , 120, 0, 1.2);
 
   // MET
-  book_TH1F("met__pt" , 180, 0, 1800);
+  book_TH1F("met__pt" , 20, 0, 500);
   book_TH1F("met__phi", 60, -3.15, 3.15);
-  book_TH1F("wlep__ht", 180, 0, 1800);
-  book_TH1F("wlep__pt", 180, 0, 1800);
+  book_TH1F("wlep__ht", 90, 0, 900);
+  book_TH1F("wlep__pt", 90, 0, 900);
   book_TH1F("wlep__Mt", 360, 0,  360);
   book_TH2F("met__pt__vs__dphi_met_lep1", 180, 0, 1800, 60, 0, 3.15);
   book_TH2F("met__pt__vs__dphi_met_jet1", 180, 0, 1800, 60, 0, 3.15);
@@ -337,7 +346,8 @@ void TTbarLJHists::fill(const uhh2::Event& event){
     if(csv > 0.890) ++jetN__CSVM;
     if(csv > 0.970) ++jetN__CSVT;
 
-    if(i > 2) continue;
+    //    if(i > 3) continue;
+   if(i > 5) continue;
 
     H1("jetA__maxCSV"+std::to_string(i+1))->Fill(jets_CSV.at(i), weight);
   }
@@ -361,84 +371,84 @@ void TTbarLJHists::fill(const uhh2::Event& event){
     H1("topjet"+std::to_string(i+1)+"__CSV")->Fill(p.btag_combinedSecondaryVertex(), weight);
   }
 
-  // TOPTAG
-  std::vector<TopJet> toptags;
-  for(unsigned int i=0; i<event.topjets->size(); ++i){
+  // // TOPTAG
+  // std::vector<TopJet> toptags;
+  // for(unsigned int i=0; i<event.topjets->size(); ++i){
 
-    const TopJet& tjet = event.topjets->at(i);
-    if(tjet_ID_(tjet, event)) toptags.push_back(tjet);
-  }
+  //   const TopJet& tjet = event.topjets->at(i);
+  //   if(tjet_ID_(tjet, event)) toptags.push_back(tjet);
+  // }
 
-  const int toptagN(toptags.size());
-  H1("toptagN")->Fill(toptagN, weight);
+  // const int toptagN(toptags.size());
+  // H1("toptagN")->Fill(toptagN, weight);
 
-  sort_by_pt<TopJet>(toptags);
-  for(int i=0; i<std::min(2, toptagN); ++i){
+  // sort_by_pt<TopJet>(toptags);
+  // for(int i=0; i<std::min(2, toptagN); ++i){
 
-    const TopJet& tj = toptags.at(i);
+  //   const TopJet& tj = toptags.at(i);
 
-    std::vector<std::string> htags_ETA({""});
-    if(i == 0){
-      if(fabs(tj.eta()) < 1.0) htags_ETA.push_back("_etaLO");
-      else                     htags_ETA.push_back("_etaHI");
-    }
+  //   std::vector<std::string> htags_ETA({""});
+  //   if(i == 0){
+  //     if(fabs(tj.eta()) < 1.0) htags_ETA.push_back("_etaLO");
+  //     else                     htags_ETA.push_back("_etaHI");
+  //   }
 
-    for(const auto& eta : htags_ETA){
+  //   for(const auto& eta : htags_ETA){
 
-      H1("toptag"+std::to_string(i+1)+eta+"__pt") ->Fill(tj.pt()                          , weight);
-      H1("toptag"+std::to_string(i+1)+eta+"__eta")->Fill(tj.eta()                         , weight);
-      H1("toptag"+std::to_string(i+1)+eta+"__phi")->Fill(tj.phi()                         , weight);
-      H1("toptag"+std::to_string(i+1)+eta+"__M")  ->Fill(tj.v4().M()                      , weight);
-      H1("toptag"+std::to_string(i+1)+eta+"__CSV")->Fill(tj.btag_combinedSecondaryVertex(), weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__pt") ->Fill(tj.pt()                          , weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__eta")->Fill(tj.eta()                         , weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__phi")->Fill(tj.phi()                         , weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__M")  ->Fill(tj.v4().M()                      , weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__CSV")->Fill(tj.btag_combinedSecondaryVertex(), weight);
 
-      // substructure
-      if(i > 0) continue;
+  //     // substructure
+  //     if(i > 0) continue;
 
-      H1("toptag"+std::to_string(i+1)+eta+"__Mpru")->Fill(tj.prunedmass()   , weight);
-      H1("toptag"+std::to_string(i+1)+eta+"__Msdp")->Fill(tj.softdropmass() , weight);
-      H1("toptag"+std::to_string(i+1)+eta+"__mmin")->Fill(m_disubjet_min(tj), weight);
-      H1("toptag"+std::to_string(i+1)+eta+"__tau2")->Fill(tj.tau2()         , weight);
-      H1("toptag"+std::to_string(i+1)+eta+"__tau3")->Fill(tj.tau3()         , weight);
-      if(tj.tau2()) H1("toptag"+std::to_string(i+1)+eta+"__tau32")->Fill(tj.tau3()/tj.tau2(), weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__Mpru")->Fill(tj.prunedmass()   , weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__Msdp")->Fill(tj.softdropmass() , weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__mmin")->Fill(m_disubjet_min(tj), weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__tau2")->Fill(tj.tau2()         , weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__tau3")->Fill(tj.tau3()         , weight);
+  //     if(tj.tau2()) H1("toptag"+std::to_string(i+1)+eta+"__tau32")->Fill(tj.tau3()/tj.tau2(), weight);
 
-      std::vector<Jet> subjets = tj.subjets();
+  //     std::vector<Jet> subjets = tj.subjets();
 
-      const int subjN(subjets.size());
+  //     const int subjN(subjets.size());
 
-      H1("toptag"+std::to_string(i+1)+eta+"__subjN")->Fill(subjN, weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__subjN")->Fill(subjN, weight);
 
-      float subj_minDR(-1.);
-      LorentzVector sum_subj(0, 0, 0, 0);
-      for  (int sj1=0    ; sj1<subjN; ++sj1){
-        for(int sj2=sj1+1; sj2<subjN; ++sj2){
+  //     float subj_minDR(-1.);
+  //     LorentzVector sum_subj(0, 0, 0, 0);
+  //     for  (int sj1=0    ; sj1<subjN; ++sj1){
+  //       for(int sj2=sj1+1; sj2<subjN; ++sj2){
 
-          const float dR = uhh2::deltaR(subjets.at(sj1), subjets.at(sj2));
-          if(dR < subj_minDR || (sj1+sj2==1)) subj_minDR = dR;
-        }
+  //         const float dR = uhh2::deltaR(subjets.at(sj1), subjets.at(sj2));
+  //         if(dR < subj_minDR || (sj1+sj2==1)) subj_minDR = dR;
+  //       }
 
-        sum_subj += subjets.at(sj1).v4();
-      }
-      H1("toptag"+std::to_string(i+1)+eta+"__Mgro")      ->Fill(sum_subj.M(), weight);
-      H1("toptag"+std::to_string(i+1)+eta+"__subj_minDR")->Fill(subj_minDR  , weight);
+  //       sum_subj += subjets.at(sj1).v4();
+  //     }
+  //     H1("toptag"+std::to_string(i+1)+eta+"__Mgro")      ->Fill(sum_subj.M(), weight);
+  //     H1("toptag"+std::to_string(i+1)+eta+"__subj_minDR")->Fill(subj_minDR  , weight);
 
-      sort_by_pt<Jet>(subjets);
-      for(int sj=0; sj<std::min(3, subjN); ++sj){
+  //     sort_by_pt<Jet>(subjets);
+  //     for(int sj=0; sj<std::min(3, subjN); ++sj){
 
-        const Jet& sjet = subjets.at(sj);
+  //       const Jet& sjet = subjets.at(sj);
 
-        H1("toptag"+std::to_string(i+1)+eta+"__subj"+std::to_string(sj+1)+"__pt") ->Fill(sjet.pt() , weight);
-        H1("toptag"+std::to_string(i+1)+eta+"__subj"+std::to_string(sj+1)+"__eta")->Fill(sjet.eta(), weight);
-      }
+  //       H1("toptag"+std::to_string(i+1)+eta+"__subj"+std::to_string(sj+1)+"__pt") ->Fill(sjet.pt() , weight);
+  //       H1("toptag"+std::to_string(i+1)+eta+"__subj"+std::to_string(sj+1)+"__eta")->Fill(sjet.eta(), weight);
+  //     }
 
-      std::sort(subjets.begin(), subjets.end(), [](const Jet& j1, const Jet& j2){return j1.btag_combinedSecondaryVertex() > j2.btag_combinedSecondaryVertex();});
-      for(int sj=0; sj<std::min(3, subjN); ++sj){
+  //     std::sort(subjets.begin(), subjets.end(), [](const Jet& j1, const Jet& j2){return j1.btag_combinedSecondaryVertex() > j2.btag_combinedSecondaryVertex();});
+  //     for(int sj=0; sj<std::min(3, subjN); ++sj){
 
-        const Jet& sjet = subjets.at(sj);
+  //       const Jet& sjet = subjets.at(sj);
 
-        H1("toptag"+std::to_string(i+1)+eta+"__subj_maxCSV"+std::to_string(sj+1))->Fill(sjet.btag_combinedSecondaryVertex(), weight);
-      }
-    }
-  }
+  //       H1("toptag"+std::to_string(i+1)+eta+"__subj_maxCSV"+std::to_string(sj+1))->Fill(sjet.btag_combinedSecondaryVertex(), weight);
+  //     }
+  //   }
+  // }
 
   // MET
   H1("met__pt") ->Fill(event.met->pt() , weight);
